@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light" />
+    <title>Terminal</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="xterm.css" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header>
+        <div class="brand">
+          <span class="mark" aria-hidden="true"></span>
+          <span>Terminal</span>
+        </div>
+        <div class="header-side">
+          <span id="target" class="target" hidden></span>
+          <button id="disconnect" class="text-button" type="button" hidden>断开</button>
+          <button id="status" class="status" type="button" hidden disabled>
+            <span class="dot" id="dot"></span>
+            <span id="status-text">连接中</span>
+          </button>
+        </div>
+      </header>
+      <main class="stage">
+        <div id="terminal"></div>
+        <form id="login" class="login">
+          <div class="login-panel">
+            <h1>连接</h1>
+            <label id="host-field">
+              主机地址
+              <input id="host" name="host" autocomplete="off" spellcheck="false" placeholder="192.168.1.10 或 host:22" />
+            </label>
+            <label id="username-field">
+              用户名
+              <input id="username" name="username" autocomplete="username" spellcheck="false" />
+            </label>
+            <label id="ssh-password-field">
+              密码
+              <input id="password" name="password" type="password" autocomplete="current-password" />
+            </label>
+            <label id="local-password-field" hidden>
+              动态密码
+              <input id="password-local" name="password-local" type="password" autocomplete="off" spellcheck="false" placeholder="向开发要当前动态密码" />
+            </label>
+            <p id="form-error" class="form-error" hidden></p>
+            <div class="actions">
+              <button id="remote" class="text-button" type="button" hidden>远程</button>
+              <button id="local" class="text-button" type="button">本机</button>
+              <button id="connect" class="primary" type="submit">连接</button>
+            </div>
+            <p class="hint">密码只用于登录你填写的主机，不会被保存。</p>
+            <div id="recent" class="recent" hidden>
+              <div class="recent-label">最近</div>
+              <div id="recent-list"></div>
+            </div>
+          </div>
+        </form>
+      </main>
+    </div>
+    <script src="xterm.js"></script>
+    <script src="xterm-addon-fit.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

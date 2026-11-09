@@ -1,0 +1,4 @@
+.idea
+vender
+**/build/**
+.DS_Store
