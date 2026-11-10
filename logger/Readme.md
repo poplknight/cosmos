@@ -8,12 +8,12 @@ cosmos 框架的日志包。底层由 **zerolog** 驱动，每条日志输出为
 import (
     "github.com/rs/zerolog/log"
 
-    "github.com/poplknight/cosmos/logger"
+    "github.com/poplknight/cosmos/infra"
 )
 
 // 从 viper 配置加载（yaml 里有 "logger:" 一节），构建的 zerolog logger
 // 会被注入到全局 log.Logger，之后整个程序直接用 zerolog 的全局 API：
-if err := logger.ReloadLogger(v); err != nil {
+if err := infra.Logger(v); err != nil {
     panic(err)
 }
 
@@ -21,16 +21,16 @@ log.Info().Msg("server started on :8787")
 log.Error().Err(err).Msg("connect failed")
 ```
 
-`ReloadLogger` 返回 `error`（logger 已注入全局，无需接收返回值）。配置键为 `logger.level` / `logger.with` / `logger.outputs`；若配置嵌套在其它节下，用 `WithReloadPrefix` 指定外层：
+`Logger` 属于基础设施层（`cosmos/infra`，负责"viper → 句柄"的装配），返回 `error`（logger 已注入全局，无需接收返回值）。配置键为 `logger.level` / `logger.with` / `logger.outputs`；若配置嵌套在其它节下，用 `infra.WithLoggerPrefix` 指定外层：
 
 ```go
 // yaml 里是 app.logger.* 时
-if err := logger.ReloadLogger(v, logger.WithReloadPrefix("app")); err != nil {
+if err := infra.Logger(v, infra.WithLoggerPrefix("app")); err != nil {
     panic(err)
 }
 ```
 
-不想用全局注入、想自己持有 zerolog.Logger 时，直接构建：
+不想用全局注入、想自己持有 zerolog.Logger 时，直接用 `logger.Config` 构建：
 
 ```go
 z, err := (logger.Config{Level: "info", Outputs: outputs}).InitLogger() // 返回 zerolog.Logger
@@ -86,8 +86,7 @@ output.OutputConfig{Kind: output.KindFile, Config: output.FileConfig{Path: path}
 ## API
 
 - `logger.Config.InitLogger() (zerolog.Logger, error)`：构建 zerolog logger（含级别过滤、固定字段、输出聚合）
-- `logger.ReloadLogger(v *viper.Viper, opts...) error`：从 viper 读配置、构建并注入全局 `log.Logger`
-- `logger.WithReloadPrefix(prefix)`：指定配置外层节（键为 `[prefix.]logger.*`）
+- 从 viper 装配并注入全局 logger 请用 `infra.Logger`（见 [infra](../infra/)），不在此包
 - 日志写入全部用 zerolog 原生 API（`log.Info().Msg(...)` / `z.Warn().Str(...).Msg(...)`），低于配置级别的日志在 zerolog 层直接丢弃
 
 输出一行 JSON，例如：
